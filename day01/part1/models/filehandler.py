@@ -62,11 +62,7 @@ class FileHandler:
             if self.file:
                 content = self.file.readlines()
                 modified_content = self.remove_alphabet_from_file(content)
-                self.modify_and_replace(modified_content)
-                
-                self.file.seek(0)
-                content = self.file.readlines()
-                modified_content = self.remove_unnecessary_digits(content)
+                modified_content = self.remove_unnecessary_digits(modified_content)
                 self.modify_and_replace(modified_content)
                 
         except Exception as e:
@@ -80,14 +76,3 @@ class FileHandler:
             print(f"Total sum of numbers: {total_sum}")
         except Exception as e:
             print(f"Error calculating sum: {e}")
-
-if  __name__ == "__main__":
-    file_handler = FileHandler("input.txt", "r") 
-    file_handler.open_file()
-    file_handler.copy_to("solution.txt")
-    file_handler.close_file()
-
-    solution_handler = FileHandler("solution.txt", "r+") 
-    solution_handler.open_file()
-    solution_handler.sort_solution()
-    solution_handler.sum_numbers()

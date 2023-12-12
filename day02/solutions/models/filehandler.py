@@ -26,6 +26,7 @@ class FileHandler:
     def copy_to(self, new_filename):
         try:
             if self.file:
+                self.file.seek(0)
                 with open(new_filename, 'w') as new_file:
                     new_file.write(self.file.read())
                 print(f"Data copied to '{new_filename}' successfully.")
@@ -65,20 +66,42 @@ class FileHandler:
     def sumSolution(self,content):
         sum = 0
         for integer,line in enumerate(content):
-            if(self.divide_into_groups(line)):
+            if(self.divide_into_groups(line, self.startFindingNum)):
                 sum += integer+1
         return sum
 
-    # gets a line and divides it into groups by ';'
-    def divide_into_groups(self, content):
-        groups = content.split(";")
+    def multiplySolution(self,content):
+        sum = 0
+        for line in content:
+            sum += self.divide_into_groups(line, self.FindingMax)
+        return sum
+
+    def FindingMax(self,groups):
+        sum = 0
+        r_max, g_max, b_max = 0,0,0
         for string in groups:
-            if(not self.check_group_valid(string)):
+           r,g,b = self.check_group_valid(string,self.findMaxTup)
+           r_max = max(r_max,int(r))
+           g_max = max(g_max,int(g))
+           b_max = max(b_max,int(b))
+           sum = r_max * g_max * b_max
+        return sum
+    def findMaxTup(self,r,g,b):
+        return (r,g,b)
+
+    
+    # gets a line and divides it into groups by ';'
+    def divide_into_groups(self, content, func):
+        groups = content.split(";")
+        return func(groups)
+    #region part1
+    def startFindingNum(self,groups):
+        for string in groups:
+            if(not self.check_group_valid(string,self.validateExceed)):
                 return False
         return True
 
-
-    def check_group_valid(self,group):
+    def check_group_valid(self,group,func):
         line = group
         # r
         r_found = self.validateNumber('r',line)
@@ -91,6 +114,9 @@ class FileHandler:
         b_found = self.validateNumber('b',line)
 
 
+        return func(r_found,g_found,b_found)
+
+    def validateExceed(self,r_found,g_found,b_found):
         if(rgb_max["red"] >= int(r_found) and rgb_max["green"] >= int(g_found) and rgb_max["blue"] >= int(b_found)):
             return True
         return False
@@ -108,22 +134,17 @@ class FileHandler:
             return num_found
         except Exception as e:
             return 0
-
-    def sort_solution(self):
-        try:
-            if self.file:
-                content = self.file.readlines()
-                modified_content = self.replace_rgb_from_file(content)
-                modified_content = self.remove_alphabet_from_file(modified_content)
-                self.modify_and_replace(str(self.sumSolution(modified_content)))
-        except Exception as e:
-            print(f"Error sorting solution: {e}")
-
-    def sum_numbers(self):
-        try:
-            self.file.seek(0)
+    #endregion
+    def sort_solution(self,part1):
+        # try:
+        if self.file:
             content = self.file.readlines()
-            total_sum = sum(int(line.strip()) for line in content)
-            print(f"Total sum of numbers: {total_sum}")
-        except Exception as e:
-            print(f"Error calculating sum: {e}")
+            modified_content = self.replace_rgb_from_file(content)
+            modified_content = self.remove_alphabet_from_file(modified_content)
+            if(part1):
+                self.modify_and_replace(str(self.sumSolution(modified_content)))
+            else:
+                self.modify_and_replace(str(self.multiplySolution(modified_content)))
+        # except Exception as e:
+        #     print(f"Error sorting solution: {e}")
+
